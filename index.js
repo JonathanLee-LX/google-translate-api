@@ -2,7 +2,8 @@ var querystring = require('querystring');
 
 var got = require('got');
 var safeEval = require('safe-eval');
-var token = require('google-translate-token');
+var token = require('./token');
+var sockAgent = require('./sock-agent')
 
 var languages = require('./languages');
 
@@ -32,7 +33,7 @@ function translate(text, opts) {
     return token.get(text).then(function (token) {
         var url = 'https://translate.google.com/translate_a/single';
         var data = {
-            client: 't',
+            client: 'gtx',
             sl: opts.from,
             tl: opts.to,
             hl: opts.to,
@@ -49,7 +50,7 @@ function translate(text, opts) {
 
         return url + '?' + querystring.stringify(data);
     }).then(function (url) {
-        return got(url).then(function (res) {
+        return got(url, {agent: sockAgent}).then(function (res) {
             var result = {
                 text: '',
                 from: {
